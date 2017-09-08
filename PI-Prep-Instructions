@@ -1,0 +1,53 @@
+The image has these steps completed already.
+
+sudo raspi-config
+  enable ssh
+  enable vnc
+  set localization
+  turn off auto-login
+
+
+/etc/default/keyboard
+update XKBLAYOUT="us"
+
+sudo nano /etc/lightdm/lightdm.conf
+comment greet-hide-users=false
+    #greet-hide-users=false
+
+download ncurses ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz
+    extract it, cd to the ncurses directory
+    ./configure
+    make
+    sudo make install
+download tn5250 http://sourceforge.net/projects/tn5250/files/tn5250/0.16.5/tn5250-0.16.5.tar.gz/download, this is V 0.16.5, the latest stable release
+    ./configure –help (to figure out what switches you need, like ssl)
+    ./configure (with the options you want)
+    make
+    sudo make install
+    sudo apt-get install xterm
+
+    sudo nano /usr/local/share/tn5250/XTerm
+    add this line at the bottom of that file:
+    xt5250.VT100*faceName: truetype
+
+    To launch :: xt5250 jde.transtar1.com
+
+
+create shortcut and place in /etc/skel
+
+sudo apt-get remove --purge wolfram-engine
+sudo apt-get remove --purge sonic-pi
+sudo apt-get remove --purge BlueJ
+sudo apt-get remove --purge scratch
+sudo apt-get remove --purge greenfoot
+sudo apt-get remove --purge node
+sudo apt-get remove --purge sense-hat
+sudo apt-get autoremove
+sudo apt-get clean
+
+sudo nano /etc/hostname
+
+#need to add auto updates
+#need to add creating Administrator account
+#need to add disable pi account
+

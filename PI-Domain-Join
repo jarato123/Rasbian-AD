@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# This script should join Debian Jessie (8) to an Active Directory domain.
+echo "Please authenticate with your sudo password"
+sudo -v
+
+echo "Please enter the hostname you wish to use (ex: dal-bwileman-pi)"
+read hostname
+
+echo $hostname > /etc/hostname
+
+if ! $(sudo which realmd 2>/dev/null); then
+    sudo aptitude install realmd adcli sssd
+fi
+
+if ! $(sudo which ntpd 2>/dev/null); then
+    sudo aptitude install ntp
+fi
+
+sudo mkdir -p /var/lib/samba/private
+
+echo "Please enter the domain you wish to join: "
+read DOMAIN
+
+echo "Please enter a domain admin login to use: "
+read ADMIN
+
+sudo realm join --user=$ADMIN $DOMAIN
+
+if [ $? -ne 0 ]; then
+    echo "AD join failed.  Please run 'journalctl -xn' to determine why."
+    exit 1
+fi
+
+sudo systemctl enable sssd
+sudo systemctl start sssd
+
+#create Home directory
+sudo mkdir /home/DGRP.AD/
+echo "session required pam_mkhomedir.so skel=/etc/skel/ umask=0022" | sudo tee -a /etc/pam.d/common-session
+echo "%PI-Admins@DGRP.AD ALL=(ALL:ALL) ALL" | sudo tee -a /etc/sudoers
+echo "The computer is joined to the domain.  Please reboot, ensure that you are connected to the network, and you should be able to login with domain credentials."
+
+#set ntp, note this will append these lines to the bottom of the file
+echo "server serverName1.domain.name iburst" | sudo tee -a /etc/ntp.conf
+echo "server serverName1.domain.name iburst" | sudo tee -a /etc/ntp.conf
+echo "server serverName1.domain.name iburst" | sudo tee -a /etc/ntp.conf
+echo "serverName1.domain.name iburst" | sudo tee -a /etc/ntp.conf
+
+#comment out old ntp servers
+sed -i -e 's/server 0.debian.pool.ntp.org iburst/# server 0.debian.pool.ntp.org iburst/g' /etc/ntp.conf
+sed -i -e 's/server 1.debian.pool.ntp.org iburst/# server 1.debian.pool.ntp.org iburst/g' /etc/ntp.conf
+sed -i -e 's/server 2.debian.pool.ntp.org iburst/# server 2.debian.pool.ntp.org iburst/g' /etc/ntp.conf
+sed -i -e 's/server 3.debian.pool.ntp.org iburst/# server 3.debian.pool.ntp.org iburst/g' /etc/ntp.conf
