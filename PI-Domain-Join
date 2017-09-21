@@ -36,9 +36,9 @@ sudo systemctl enable sssd
 sudo systemctl start sssd
 
 #create Home directory
-sudo mkdir /home/DGRP.AD/
+sudo mkdir /home/Domain/
 echo "session required pam_mkhomedir.so skel=/etc/skel/ umask=0022" | sudo tee -a /etc/pam.d/common-session
-echo "%PI-Admins@DGRP.AD ALL=(ALL:ALL) ALL" | sudo tee -a /etc/sudoers
+echo "%PI-Admins@Domain ALL=(ALL:ALL) ALL" | sudo tee -a /etc/sudoers
 echo "The computer is joined to the domain.  Please reboot, ensure that you are connected to the network, and you should be able to login with domain credentials."
 
 #set ntp, note this will append these lines to the bottom of the file
